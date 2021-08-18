@@ -7,7 +7,9 @@ if(!isset($_SESSION['login_id'])){
     exit;
 }
 
+
 $id = $_SESSION['login_id'];
+
 
 
 $get_user = mysqli_query($db_connection, "SELECT * FROM `users` WHERE `google_id`='$id'");
@@ -96,25 +98,25 @@ else{
         </div>
     </div>
     <?php
-        
+        $_SESSION['email'] = $user['email'];
+       
 
         $dbh = new PDO("mysql:host=localhost;dbname=google_login", "root", "");
         if(isset($_POST['btn'])){
         $name = $_FILES['myfile']['name'];
         $type = $_FILES['myfile']['type'];
         $data = file_get_contents($_FILES['myfile']['tmp_name']);
+     $user_email = $_SESSION['email'];
 
         $stmt = $dbh -> prepare("insert into data values('',?,?,?,?)");
         $stmt->bindParam(1,$name);
         $stmt->bindParam(2,$type);
         $stmt->bindParam(3,$data);
-        $stmt->bindParam(4,$user_name);
+        $stmt->bindParam(4,$user_email);
         $stmt->execute();
     
         }
-         // if user not exists we will insert the user
-        // $insert = mysqli_query($db_connection, "INSERT INTO `users`(`google_id`,`name`,`email`,`profile_image`) VALUES('$id','$full_name','$email','$profile_pic')");
-
+        
         ?>
 
     <form method="post" enctype="multipart/form-data">
@@ -123,15 +125,15 @@ else{
  <button name="btn">Upload file</button>
 </form>
    <?php
-   $stat = $dbh -> prepare("SELECT * from data");
+   $stat = $dbh -> prepare("SELECT * FROM `data` WHERE `user_email` = '".$_SESSION['email']."' ");
+
    $stat->execute();
    while ($row = $stat->fetch()){
        echo "<li><a target='_blank' href='upload_file/view.php?id=".$row['id']."'>".$row['name']."</a></li>";
    }
    ?>
-   <div class="form-group">
-            <input readonly type="text" name="name" class="form-control" value="<?php echo $user['name']; ?>" placeholder="Enter Name" required>
-          </div>
+   
+   
 
    
 </body>

@@ -1,0 +1,37 @@
+
+    <?php
+        $_SESSION['email'] = $user['email'];
+       
+
+        $dbh = new PDO("mysql:host=localhost;dbname=google_login", "root", "");
+        if(isset($_POST['btn'])){
+        $name = $_FILES['myfile']['name'];
+        $type = $_FILES['myfile']['type'];
+        $data = file_get_contents($_FILES['myfile']['tmp_name']);
+     $user_email = $_SESSION['email'];
+
+        $stmt = $dbh -> prepare("insert into data values('',?,?,?,?)");
+        $stmt->bindParam(1,$name);
+        $stmt->bindParam(2,$type);
+        $stmt->bindParam(3,$data);
+        $stmt->bindParam(4,$user_email);
+        $stmt->execute();
+    
+        }
+        
+        ?>
+
+    <form method="post" enctype="multipart/form-data">
+  Select your code to upload:
+  <input type="file" name="myfile" id="myfile"/>
+ <button name="btn">Upload file</button>
+</form>
+   <?php
+   $stat = $dbh -> prepare("SELECT * FROM `data` WHERE `user_email` = '".$_SESSION['email']."' ");
+
+   $stat->execute();
+   while ($row = $stat->fetch()){
+       echo "<li><a target='_blank' href='upload_file/view.php?id=".$row['id']."'>".$row['name']."</a></li>";
+   }
+   ?>
+   
